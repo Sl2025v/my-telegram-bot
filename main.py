@@ -1,55 +1,25 @@
-import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from aiogram.enums import ParseMode
-from aiogram.client.default import DefaultBotProperties
-from dotenv import load_dotenv
-import asyncio
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import os
+from dotenv import load_dotenv
 
-# Завантажуємо токен з .env
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-
-# Перевірка, чи токен зчитано
 if not BOT_TOKEN:
-    raise ValueError("BOT_TOKEN не знайдено у файлі .env. Переконайтесь, що файл .env містить BOT_TOKEN=ваш_токен")
+    raise ValueError("BOT_TOKEN не знайдено.")
 
-# Налаштування логування
-logging.basicConfig(level=logging.INFO)
+bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
+dp = Dispatcher(bot)
 
-# Ініціалізація бота та диспетчера
-bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-dp = Dispatcher()
+@dp.message_handler(commands=["start"])
+async def start_command(message: types.Message):
+    keyboard = InlineKeyboardMarkup()
+    keyboard.add(InlineKeyboardButton("НАШ ВЕБСАЙТ", url="https://haisynska-gromada.gov.ua"))
+    keyboard.add(InlineKeyboardButton("СТОРІНКА ФБ", url="https://www.facebook.com/haisynska.gromada"))
+    keyboard.add(InlineKeyboardButton("Онлайн запис", url="https://haisynska-gromada.gov.ua/booking"))
+    await message.answer("Вітаємо в офіційному боті ЦНАП Гайсинської громади! 👋 Оберіть опцію:", reply_markup=keyboard)
 
-# Створюємо клавіатуру
-keyboard = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text="НАШ ВЕБСАЙТ"), KeyboardButton(text="СТОРІНКА ФБ")],
-        [KeyboardButton(text="Онлайн запис")]
-    ],
-    resize_keyboard=True
-)
-
-# Обробник команди /start з клавіатурою
-@dp.message(Command(commands=['start']))
-async def send_welcome(message: types.Message):
-    await message.reply("Оберіть опцію:", reply_markup=keyboard)
-
-# Обробник натискань кнопок
-@dp.message(lambda message: message.text in ["НАШ ВЕБСАЙТ", "СТОРІНКА ФБ", "Онлайн запис"])
-async def handle_buttons(message: types.Message):
-    if message.text == "НАШ ВЕБСАЙТ":
-        await message.reply("Відвідай наш вебсайт: <a href='https://297975.wixsite.com/gaicnap'>НАШ ВЕБСАЙТ</a>")
-    elif message.text == "СТОРІНКА ФБ":
-        await message.reply("Перейди на нашу сторінку у Facebook: <a href='https://www.facebook.com/gai.chnap'>СТОРІНКА ФБ</a>")
-    elif message.text == "Онлайн запис":
-        await message.reply("Перейди за посиланням для онлайн запису: <a href='https://cherga.diia.gov.ua/app/thematic_area_office/350'>Онлайн запис</a>")
-
-# Запуск бота
-async def main():
-    await dp.start_polling(bot, skip_updates=True)
-
-if __name__ == '__main__':
-    asyncio.run(main())
+if __name__ == "__main__":
+    from aiogram import executor
+    executor.start_polling(dp, skip_updates=True)
