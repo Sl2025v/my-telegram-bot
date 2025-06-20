@@ -1,35 +1,26 @@
-﻿from aiogram import Bot, Dispatcher, types
-from aiogram.filters import Command
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.client.default import DefaultBotProperties
-import os
-from dotenv import load_dotenv
-import logging
+﻿import feedparser
+from aiogram import Bot, Dispatcher, types
+from aiogram.utils import executor
 
-logging.basicConfig(level=logging.INFO)
+bot = Bot(token="8154400685:AAHndHpdhTIi8hEs-Nk-UVxr0Xom5BRAwZQ")
+dp = Dispatcher(bot)
 
-load_dotenv()
-BOT_TOKEN = os.getenv('BOT_TOKEN')
-logging.info(f'BOT_TOKEN: {BOT_TOKEN}')
-if not BOT_TOKEN:
-    raise ValueError('BOT_TOKEN не знайдено.')
+@dp.message_handler(commands=['start'])
+async def send_welcome(message: types.Message):
+    keyboard = types.InlineKeyboardMarkup()
+    keyboard.add(types.InlineKeyboardButton("НАШ ВЕБСАЙТ", url="https://297975.wixsite.com/gaicnap"))
+    keyboard.add(types.InlineKeyboardButton("СТОРІНКА ФБ", url="https://www.facebook.com/gai.chnap"))
+    keyboard.add(types.InlineKeyboardButton("Онлайн запис", url="https://cherga.diia.gov.ua/app/thematic_area_office/350"))
+    await message.reply("Вітаю! Оберіть опцію:", reply_markup=keyboard)
 
-bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode='HTML'))
-dp = Dispatcher()
-
-@dp.message(Command('start'))
-async def start_command(message: types.Message):
-    logging.info(f'Received /start from {message.from_user.id}')
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text='НАШ ВЕБСАЙТ', url='https://297975.wixsite.com/gaicnap')],
-        [InlineKeyboardButton(text='СТОРІНКА ФБ', url='https://www.facebook.com/gai.chnap')],
-        [InlineKeyboardButton(text='Онлайн запис', url='https://cherga.diia.gov.ua/app/thematic_area_office/350')]
-    ])
-    await message.answer('Вітаємо в офіційному боті ЦНАП Гайсинської громади! 👋 Оберіть опцію:', reply_markup=keyboard)
+@dp.message_handler(commands=['news'])
+async def send_news(message: types.Message):
+    feed = feedparser.parse("https://rss.app/feeds/b8s7IGNBtm1epM28.xml")
+    if feed.entries:
+        news = "\n\n".join(f"{entry.title}: {entry.summary if 'summary' in entry else entry.link}" for entry in feed.entries[:5])
+        await message.reply(f"Останні новини:\n{news[:4096]}")
+    else:
+        await message.reply("Немає доступних новин.")
 
 if __name__ == '__main__':
-    import asyncio
-    async def main():
-        logging.info('Starting polling...')
-        await dp.start_polling(bot, skip_updates=True)
-    asyncio.run(main())
+    executor.start_polling(dp, skip_updates=True)
