@@ -15,7 +15,7 @@ async def send_welcome(message: types.Message):
 
 @dp.message_handler(commands=['news'])
 async def send_news(message: types.Message):
-    feed = feedparser.parse("https://rss.app/feeds/b8s7IGNBtm1epM28.xml")
+    feed = feedparser.parse("http://fetchrss.com/rss/68554af6b931f9efab0720a368554b11611fe25418090fc2.xml")
     if feed.entries:
         news = "\n\n".join(f"{entry.title}: {entry.summary if 'summary' in entry else entry.link}" for entry in feed.entries[:5])
         await message.reply(f"Останні новини:\n{news[:4096]}")
