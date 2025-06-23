@@ -19,8 +19,14 @@ async def send_news(message: types.Message):
     feed = feedparser.parse("http://fetchrss.com/rss/68554af6b931f9efab0720a368554b11611fe25418090fc2.xml")
     await message.reply(f"Debug: Status={feed.status}, Entries={len(feed.entries)}")
     if feed.entries:
-        news = "\n\n".join(f"{entry.title}: {entry.summary if 'summary' in entry else entry.link}" for entry in feed.entries[:5])
-        await message.reply(f"Останні новини:\n{news[:4096]}")
+        news_items = []
+        for entry in feed.entries[:5]:
+            item = f"{entry.title}: {entry.summary if 'summary' in entry else entry.link}"
+            news_items.append(item)
+        news_text = "\n\n".join(news_items)
+        chunk_size = 4096
+        for i in range(0, len(news_text), chunk_size):
+            await message.reply(news_text[i:i + chunk_size] or "Немає додаткового тексту.")
     else:
         await message.reply("Немає доступних новин.")
 
