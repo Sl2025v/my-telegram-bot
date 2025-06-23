@@ -2,6 +2,8 @@
 import feedparser
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
+import fcntl
+import time
 
 bot = Bot(token="8154400685:AAHndHpdhTIi8hEs-Nk-UVxr0Xom5BRAwZQ")
 dp = Dispatcher(bot)
@@ -30,6 +32,18 @@ async def send_news(message: types.Message):
     else:
         await message.reply("Немає доступних новин.")
 
-if __name__ == '__main__':
+def run_bot():
     if os.environ.get('RUN_MAIN') == 'true':
-        executor.start_polling(dp, skip_updates=True)
+        lock_file = '/tmp/bot.lock'
+        fp = open(lock_file, 'w')
+        try:
+            fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            executor.start_polling(dp, skip_updates=True)
+        except IOError:
+            print("Another instance is running, exiting...")
+            return
+        finally:
+            fp.close()
+
+if __name__ == '__main__':
+    run_bot()
