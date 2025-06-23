@@ -1,4 +1,5 @@
-﻿import feedparser
+﻿import os
+import feedparser
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
 
@@ -16,6 +17,7 @@ async def send_welcome(message: types.Message):
 @dp.message_handler(commands=['news'])
 async def send_news(message: types.Message):
     feed = feedparser.parse("http://fetchrss.com/rss/68554af6b931f9efab0720a368554b11611fe25418090fc2.xml")
+    await message.reply(f"Debug: Status={feed.status}, Entries={len(feed.entries)}")
     if feed.entries:
         news = "\n\n".join(f"{entry.title}: {entry.summary if 'summary' in entry else entry.link}" for entry in feed.entries[:5])
         await message.reply(f"Останні новини:\n{news[:4096]}")
@@ -23,4 +25,5 @@ async def send_news(message: types.Message):
         await message.reply("Немає доступних новин.")
 
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+    if os.environ.get('RUN_MAIN') == 'true':
+        executor.start_polling(dp, skip_updates=True)
