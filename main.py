@@ -56,10 +56,10 @@ def signal_handler(sig, frame):
     print('Received SIGTERM, shutting down...')
     sys.exit(0)
 
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 10000))  # Використовуй PORT із змінних
-    print(f"Binding to port {port} on 0.0.0.0")  # Лог для перевірки
-    signal.signal(signal.SIGTERM, signal_handler)  # Обробка SIGTERM
+iif __name__ == '__main__':
+    port = int(os.environ.get('PORT', 10000))
+    print(f"Binding to port {port} on 0.0.0.0")
+    signal.signal(signal.SIGTERM, signal_handler)
     start_webhook(
         dispatcher=dp,
         webhook_path=WEBHOOK_PATH,
