@@ -1,4 +1,4 @@
-﻿import os
+﻿iimport os
 import feedparser
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -57,6 +57,6 @@ if __name__ == '__main__':
             on_startup=on_startup,
             on_shutdown=on_shutdown,
             skip_updates=True,
-            host='0.0.0.0',
+            host='0.0.0.0',  # Прив’яжемо до 0.0.0.0, як порадила підтримка
             port=port
         )
