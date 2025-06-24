@@ -56,7 +56,7 @@ def signal_handler(sig, frame):
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))  # Використовуй PORT із змінних
-    signal.signal(signal.SIGTERM, signal_handler)  # Додали обробку SIGTERM
+    signal.signal(signal.SIGTERM, signal_handler)  # Обробка SIGTERM
     start_webhook(
         dispatcher=dp,
         webhook_path=WEBHOOK_PATH,
