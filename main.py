@@ -49,7 +49,7 @@ async def on_shutdown(dp):
     print("Webhook видалено!")
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8080))  # Використовуй PORT із змінних або 8080 за замовчуванням
+    port = int(os.environ.get('PORT', 8080))  # Використовуй PORT із змінних або 10000 (за замовчуванням Render)
     if os.environ.get('RUN_MAIN') == 'true':
         start_webhook(
             dispatcher=dp,
