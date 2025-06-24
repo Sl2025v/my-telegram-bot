@@ -1,5 +1,7 @@
 ﻿import os
 import feedparser
+import signal
+import sys
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils import executor
@@ -48,14 +50,19 @@ async def on_shutdown(dp):
     await bot.delete_webhook()
     print("Webhook видалено!")
 
+def signal_handler(sig, frame):
+    print('Received SIGTERM, shutting down...')
+    sys.exit(0)
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))  # Використовуй PORT із змінних
+    signal.signal(signal.SIGTERM, signal_handler)  # Додали обробку SIGTERM
     start_webhook(
         dispatcher=dp,
         webhook_path=WEBHOOK_PATH,
         on_startup=on_startup,
         on_shutdown=on_shutdown,
         skip_updates=True,
-        host='0.0.0.0',  # Прив’яжемо до 0.0.0.0
+        host='0.0.0.0',
         port=port
     )
