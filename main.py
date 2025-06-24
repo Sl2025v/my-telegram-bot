@@ -57,5 +57,5 @@ if __name__ == '__main__':
             on_shutdown=on_shutdown,
             skip_updates=True,
             host='0.0.0.0',
-            port=8080
+            port=8080  # Явно вкажи порт
         )
