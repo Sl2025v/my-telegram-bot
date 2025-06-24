@@ -36,8 +36,8 @@ async def send_news(message: types.Message):
     else:
         await message.reply("Немає доступних новин.")
 
-WEBHOOK_HOST = 'https://gai-cnap-bot-web.onrender.com'  # Перевір URL у Dashboard
-WEBHOOK_PATH = '/'  # Змінено на '/' за рекомендацією підтримки
+WEBHOOK_HOST = 'https://gai-cnap-bot-web.onrender.com'  # Перевір у Dashboard
+WEBHOOK_PATH = '/'  # За рекомендацією підтримки
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
 async def on_startup(dp):
@@ -49,14 +49,13 @@ async def on_shutdown(dp):
     print("Webhook видалено!")
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 10000))  # Використовуй PORT із змінних або 10000
-    if os.environ.get('RUN_MAIN') == 'true':
-        start_webhook(
-            dispatcher=dp,
-            webhook_path=WEBHOOK_PATH,
-            on_startup=on_startup,
-            on_shutdown=on_shutdown,
-            skip_updates=True,
-            host='0.0.0.0',  # Прив’яжемо до 0.0.0.0
-            port=port
-        )
+    port = int(os.environ.get('PORT', 10000))  # Використовуй PORT із змінних
+    start_webhook(
+        dispatcher=dp,
+        webhook_path=WEBHOOK_PATH,
+        on_startup=on_startup,
+        on_shutdown=on_shutdown,
+        skip_updates=True,
+        host='0.0.0.0',  # Прив’яжемо до 0.0.0.0
+        port=port
+    )
