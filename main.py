@@ -1,4 +1,4 @@
-﻿iimport os
+﻿import os
 import feedparser
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -36,7 +36,7 @@ async def send_news(message: types.Message):
     else:
         await message.reply("Немає доступних новин.")
 
-WEBHOOK_HOST = 'https://gai-cnap-bot-web.onrender.com'  # Онови URL із Dashboard
+WEBHOOK_HOST = 'https://gai-cnap-bot-web.onrender.com'  # Перевір цей URL у Dashboard
 WEBHOOK_PATH = '/webhook'
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
@@ -57,6 +57,6 @@ if __name__ == '__main__':
             on_startup=on_startup,
             on_shutdown=on_shutdown,
             skip_updates=True,
-            host='0.0.0.0',  # Прив’яжемо до 0.0.0.0, як порадила підтримка
+            host='0.0.0.0',
             port=port
         )
