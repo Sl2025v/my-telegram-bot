@@ -1,10 +1,10 @@
 ﻿import os
+import feedparser
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils import executor
 from aiogram.utils.executor import start_webhook
 
-# Отримуємо токен із змінної оточення
 bot_token = os.environ.get('BOT_TOKEN')
 if not bot_token:
     raise ValueError('BOT_TOKEN не знайдено.')
@@ -12,7 +12,6 @@ bot = Bot(token=bot_token)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
-# Обробники команд
 @dp.message_handler(commands=['start'])
 async def send_welcome(message: types.Message):
     keyboard = types.InlineKeyboardMarkup()
@@ -37,7 +36,6 @@ async def send_news(message: types.Message):
     else:
         await message.reply("Немає доступних новин.")
 
-# Налаштування Webhook
 WEBHOOK_HOST = 'https://gai-cnap-bot-web.onrender.com'  # Онови URL із Dashboard
 WEBHOOK_PATH = '/webhook'
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
