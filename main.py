@@ -2,11 +2,13 @@
 import feedparser
 import signal
 import sys
+import pip
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils import executor
 from aiogram.utils.executor import start_webhook
 
+print(f"Pip version: {pip.__version__}")  # Лог версії pip
 bot_token = os.environ.get('BOT_TOKEN')
 if not bot_token:
     raise ValueError('BOT_TOKEN не знайдено.')
