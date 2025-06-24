@@ -58,6 +58,7 @@ def signal_handler(sig, frame):
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))  # Використовуй PORT із змінних
+    print(f"Binding to port {port} on 0.0.0.0")  # Додали лог для перевірки
     signal.signal(signal.SIGTERM, signal_handler)  # Обробка SIGTERM
     start_webhook(
         dispatcher=dp,
