@@ -36,8 +36,8 @@ async def send_news(message: types.Message):
     else:
         await message.reply("Немає доступних новин.")
 
-WEBHOOK_HOST = 'https://gai-cnap-bot-web.onrender.com'  # Перевір цей URL у Dashboard
-WEBHOOK_PATH = '/webhook'
+WEBHOOK_HOST = 'https://gai-cnap-bot-web.onrender.com'  # Перевір URL у Dashboard
+WEBHOOK_PATH = '/'  # Змінено на '/' за рекомендацією підтримки
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
 async def on_startup(dp):
@@ -57,6 +57,6 @@ if __name__ == '__main__':
             on_startup=on_startup,
             on_shutdown=on_shutdown,
             skip_updates=True,
-            host='0.0.0.0',
+            host='0.0.0.0',  # Прив’яжемо до 0.0.0.0
             port=port
         )
