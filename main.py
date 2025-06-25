@@ -56,7 +56,7 @@ def signal_handler(sig, frame):
     print('Received SIGTERM, shutting down...')
     sys.exit(0)
 
-iif __name__ == '__main__':
+if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     print(f"Binding to port {port} on 0.0.0.0")
     signal.signal(signal.SIGTERM, signal_handler)
