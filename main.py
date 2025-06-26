@@ -60,7 +60,7 @@ def signal_handler(sig, frame):
 
 async def handle_webhook(request):
     update = await request.json()
-    Dispatcher.update_outer_queue.put_nowait(update)
+    Dispatcher.update_outer_queue.put_nowait(update)  # Передаємо оновлення в чергу диспетчера
     return web.Response(text="OK")
 
 async def main():
@@ -75,11 +75,8 @@ async def main():
     await site.start()
     print("Web server started")
 
-    # Замість start_polling запускаємо цикл обробки подій
-    await dp.start_polling(bot)  # Додаємо bot як аргумент, якщо потрібно, але краще уникати для вебхука
-    # Для вебхука достатньо запуску сервера, опитування не потрібне
-    # Замість цього просто тримаємо цикл
-    await asyncio.Event().wait()  # Тримаємо процес активним
+    # Не використовуємо start_polling, лише тримаємо цикл
+    await asyncio.Event().wait()  # Утримуємо процес активним
 
 if __name__ == '__main__':
     import asyncio
