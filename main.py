@@ -7,18 +7,17 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.filters import Command
 from aiohttp import web
 
 print(f"Pip version: {pip.__version__}")
 
-bot_token = os.environ.get('BOT_TOKEN')
-if not bot_token:
-    raise ValueError('BOT_TOKEN не знайдено.')
+bot_token = os.environ.get('BOT_TOKEN', '8154400685:AAHndHpdhTIi8hEs-Nk-UVxr0Xom5BRAwZQ')
 bot = Bot(token=bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 
-@dp.message_handler(commands=['start'])
+@dp.message(Command("start"))
 async def send_welcome(message: types.Message):
     keyboard = types.InlineKeyboardMarkup(inline_keyboard=[
         [types.InlineKeyboardButton(text="НАШ ВЕБСАЙТ", url="https://297975.wixsite.com/gaicnap")],
@@ -27,7 +26,7 @@ async def send_welcome(message: types.Message):
     ])
     await message.reply("Вітаю! Оберіть опцію:", reply_markup=keyboard)
 
-@dp.message_handler(commands=['news'])
+@dp.message(Command("news"))
 async def send_news(message: types.Message):
     feed = feedparser.parse("http://fetchrss.com/rss/68554af6b931f9efab0720a368554b11611fe25418090fc2.xml")
     await message.reply(f"Debug: Status={feed.status}, Entries={len(feed.entries)}")
@@ -76,8 +75,11 @@ async def main():
     await site.start()
     print("Web server started")
 
-    # Запускаємо диспетчер
-    await dp.start_polling()
+    # Замість start_polling запускаємо цикл обробки подій
+    await dp.start_polling(bot)  # Додаємо bot як аргумент, якщо потрібно, але краще уникати для вебхука
+    # Для вебхука достатньо запуску сервера, опитування не потрібне
+    # Замість цього просто тримаємо цикл
+    await asyncio.Event().wait()  # Тримаємо процес активним
 
 if __name__ == '__main__':
     import asyncio
