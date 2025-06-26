@@ -4,7 +4,9 @@ import signal
 import sys
 import pip
 from aiogram import Bot, Dispatcher, types
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.enums import ParseMode
+from aiogram.client.default import DefaultBotProperties
+from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils import executor
 from aiogram.utils.executor import start_webhook
 from aiohttp import web
@@ -14,16 +16,17 @@ print(f"Pip version: {pip.__version__}")
 bot_token = os.environ.get('BOT_TOKEN')
 if not bot_token:
     raise ValueError('BOT_TOKEN не знайдено.')
-bot = Bot(token=bot_token)
-storage = MemoryStorage()
-dp = Dispatcher(bot, storage=storage)
+bot = Bot(token=bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+storage = MemoryStorage()  # Оновлено до нового API
+dp = Dispatcher(storage=storage)
 
 @dp.message_handler(commands=['start'])
 async def send_welcome(message: types.Message):
-    keyboard = types.InlineKeyboardMarkup()
-    keyboard.add(types.InlineKeyboardButton("НАШ ВЕБСАЙТ", url="https://297975.wixsite.com/gaicnap"))
-    keyboard.add(types.InlineKeyboardButton("СТОРІНКА ФБ", url="https://www.facebook.com/gai.chnap"))
-    keyboard.add(types.InlineKeyboardButton("Онлайн запис", url="https://cherga.diia.gov.ua/app/thematic_area_office/350"))
+    keyboard = types.InlineKeyboardMarkup(inline_keyboard=[
+        [types.InlineKeyboardButton(text="НАШ ВЕБСАЙТ", url="https://297975.wixsite.com/gaicnap")],
+        [types.InlineKeyboardButton(text="СТОРІНКА ФБ", url="https://www.facebook.com/gai.chnap")],
+        [types.InlineKeyboardButton(text="Онлайн запис", url="https://cherga.diia.gov.ua/app/thematic_area_office/350")]
+    ])
     await message.reply("Вітаю! Оберіть опцію:", reply_markup=keyboard)
 
 @dp.message_handler(commands=['news'])
@@ -66,7 +69,7 @@ if __name__ == '__main__':
     print(f"Binding to port {port} on 0.0.0.0")
     signal.signal(signal.SIGTERM, signal_handler)
     app = web.Application()
-    app.router.add_get('/', on_webhook)  # Додаємо базовий маршрут
+    app.router.add_get('/', on_webhook)
     executor.start_webhook(
         dispatcher=dp,
         webhook_path=WEBHOOK_PATH,
@@ -75,5 +78,5 @@ if __name__ == '__main__':
         skip_updates=True,
         host='0.0.0.0',
         port=port,
-        webapp=app  # Передаємо веб-додаток
+        webapp=app
     )
