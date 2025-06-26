@@ -7,8 +7,10 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils import executor
 from aiogram.utils.executor import start_webhook
+from aiohttp import web
 
-print(f"Pip version: {pip.__version__}")  # Лог версії pip
+print(f"Pip version: {pip.__version__}")
+
 bot_token = os.environ.get('BOT_TOKEN')
 if not bot_token:
     raise ValueError('BOT_TOKEN не знайдено.')
@@ -40,8 +42,8 @@ async def send_news(message: types.Message):
     else:
         await message.reply("Немає доступних новин.")
 
-WEBHOOK_HOST = 'https://gai-cnap-bot-web.onrender.com'  # Перевір у Dashboard
-WEBHOOK_PATH = '/'  # За рекомендацією підтримки
+WEBHOOK_HOST = 'https://gai-cnap-bot-web.onrender.com'
+WEBHOOK_PATH = '/'
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
 async def on_startup(dp):
@@ -56,16 +58,22 @@ def signal_handler(sig, frame):
     print('Received SIGTERM, shutting down...')
     sys.exit(0)
 
+async def on_webhook(request):
+    return web.Response(text="Webhook active")
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     print(f"Binding to port {port} on 0.0.0.0")
     signal.signal(signal.SIGTERM, signal_handler)
-    start_webhook(
+    app = web.Application()
+    app.router.add_get('/', on_webhook)  # Додаємо базовий маршрут
+    executor.start_webhook(
         dispatcher=dp,
         webhook_path=WEBHOOK_PATH,
         on_startup=on_startup,
         on_shutdown=on_shutdown,
         skip_updates=True,
         host='0.0.0.0',
-        port=port
+        port=port,
+        webapp=app  # Передаємо веб-додаток
     )
