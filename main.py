@@ -7,8 +7,6 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.utils import executor
-from aiogram.utils.executor import start_webhook
 from aiohttp import web
 
 print(f"Pip version: {pip.__version__}")
@@ -17,7 +15,7 @@ bot_token = os.environ.get('BOT_TOKEN')
 if not bot_token:
     raise ValueError('BOT_TOKEN не знайдено.')
 bot = Bot(token=bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-storage = MemoryStorage()  # Оновлено до нового API
+storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 
 @dp.message_handler(commands=['start'])
@@ -61,22 +59,26 @@ def signal_handler(sig, frame):
     print('Received SIGTERM, shutting down...')
     sys.exit(0)
 
-async def on_webhook(request):
-    return web.Response(text="Webhook active")
+async def handle_webhook(request):
+    update = await request.json()
+    Dispatcher.update_outer_queue.put_nowait(update)
+    return web.Response(text="OK")
 
-if __name__ == '__main__':
+async def main():
     port = int(os.environ.get('PORT', 10000))
     print(f"Binding to port {port} on 0.0.0.0")
     signal.signal(signal.SIGTERM, signal_handler)
     app = web.Application()
-    app.router.add_get('/', on_webhook)
-    executor.start_webhook(
-        dispatcher=dp,
-        webhook_path=WEBHOOK_PATH,
-        on_startup=on_startup,
-        on_shutdown=on_shutdown,
-        skip_updates=True,
-        host='0.0.0.0',
-        port=port,
-        webapp=app
-    )
+    app.router.add_post(WEBHOOK_PATH, handle_webhook)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, host='0.0.0.0', port=port)
+    await site.start()
+    print("Web server started")
+
+    # Запускаємо диспетчер
+    await dp.start_polling()
+
+if __name__ == '__main__':
+    import asyncio
+    asyncio.run(main())
